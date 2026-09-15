@@ -1,0 +1,54 @@
+tag 8e497837b2015e1fadd58916420648aa71820e65 7.3.30
+Author:	subversion <svn@deadlybossmods.com>
+Date:	Sun May 13 02:33:42 2018 +0200
+
+Tagging as 7.3.30
+
+commit a4c3aa492af1a040154b3c4bc067e32b3b2f5ee7
+Author: subversion <svn@deadlybossmods.com>
+Date:   Sun May 13 02:33:42 2018 +0200
+
+    increment version number to 7.3.30
+
+commit 3470892bfbe64038bf0388a838493d769543973e
+Author: subversion <svn@deadlybossmods.com>
+Date:   Sat May 12 20:11:43 2018 +0200
+
+    Omega via svn r17517:
+    Version check update
+
+commit 8c89bb2e03b288e0655a866f1bb916f6f8432001
+Author: subversion <svn@deadlybossmods.com>
+Date:   Sat May 12 08:37:51 2018 +0200
+
+    Omega via svn r17516:
+    CN update
+
+commit 7a7efbb12984ec8b4a5a8a28f023ed638901741d
+Author: subversion <svn@deadlybossmods.com>
+Date:   Sat May 12 06:09:42 2018 +0200
+
+    Omega via svn r17515:
+    Updated G?\226?\128?\153huun P1 and P2 and added more P3 drycodes/ai timers
+
+commit b408c7f3ae8901eff69f03d274bdabceb8fc8d1e
+Author: subversion <svn@deadlybossmods.com>
+Date:   Sat May 12 03:34:11 2018 +0200
+
+    Omega via svn r17514:
+    Push finished Zekvhozj mod
+
+commit 3780b18734f888eafed6a2326ac5f098521a7231
+Author: subversion <svn@deadlybossmods.com>
+Date:   Fri May 11 23:45:32 2018 +0200
+
+    Omega via svn r17513:
+    lower tank swap amount on ghuun since he hits like a mack truck
+
+commit e92548006ce27588e1348e7b7e7ee97db26ae6d2
+Author: subversion <svn@deadlybossmods.com>
+Date:   Fri May 11 20:24:45 2018 +0200
+
+    tandanu via svn r17512:
+    increment alpha version
+
