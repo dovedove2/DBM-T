@@ -27,7 +27,7 @@ local specWarnWhirlOfFlame			= mod:NewSpecialWarningDodge(221634, nil, nil, nil,
 local specWarnOverDetonation		= mod:NewSpecialWarningRun(221688, nil, nil, nil, 4, 2)
 local specWarnDarkMending			= mod:NewSpecialWarningInterrupt(225573, "HasInterrupt", nil, nil, 1, 2)
 
-local timerRoleplay					= mod:NewTimer(27, "timerRoleplay", "Interface\\Icons\\Spell_Holy_BorrowedTime", nil, nil, 7)
+local timerRoleplay					= mod:NewTimer(33, "timerRoleplay", "Interface\\Icons\\Spell_Holy_BorrowedTime", nil, nil, 7)
 
 function mod:SPELL_CAST_START(args)
 	if not self.Options.Enabled then return end
