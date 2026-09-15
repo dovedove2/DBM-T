@@ -35,8 +35,8 @@ local timerHatecoilCD				= mod:NewCDTimer(27, 192072, nil, nil, nil, 1, nil, DBM
 local timerSpearCD					= mod:NewCDTimer(27, 192094, nil, nil, nil, 3)
 local timerThrowSpearCD				= mod:NewCDTimer(15, 192131, nil, nil, nil, 3, nil, DBM_CORE_HEALER_ICON..DBM_CORE_DEADLY_ICON)
 
-local yellImpalingSpear				= mod:NewYell(192094, nil, nil, nil, "YELL")
---local yellThrowSpear				= mod:NewYell(192131, nil, nil, nil, "YELL")
+local yellImpalingSpear				= mod:NewYell(192094)
+--local yellThrowSpear				= mod:NewYell(192131)
 
 local countdownCrashingwave			= mod:NewCountdown(27, 191900, nil, nil, 5)
 local countdownSpear2				= mod:NewCountdownFades("Alt5", 192094, nil, nil, 5)

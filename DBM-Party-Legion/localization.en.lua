@@ -109,6 +109,11 @@ L= DBM:GetModLocalization(1480)
 -----------------------
 L= DBM:GetModLocalization(1490)
 
+L:SetWarningLocalization({
+	specWarnStaticNova			= "Static Nova - move to land",
+	specWarnFocusedLightning	= "Focused Lightning - move to water"
+})
+
 -----------------------
 -- King Deepbeard --
 -----------------------
@@ -425,9 +430,9 @@ L:SetMiscLocalization({
 	Pouch7		= false,
 	Found		= "Now now, let's not be hasty",
 	--
-	Gloves		= "Wears gloves",
+	Gloves		= "Gloves",
 	NoGloves	= "No gloves",
-	Cape		= "Wearing a cape",
+	Cape		= "Cape",
 	Nocape		= "No cape",
 	LightVest	= "Light vest",
 	DarkVest	= "Dark vest",
@@ -741,6 +746,10 @@ L= DBM:GetModLocalization(1905)
 -- Trashbite the Scornful  --
 -----------------------
 L= DBM:GetModLocalization(1906)
+
+L:SetMiscLocalization({
+	bookCase	=	"Behind bookcase"
+})
 
 -----------------------
 -- Domatrax --
