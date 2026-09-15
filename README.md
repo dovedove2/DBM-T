@@ -1,2 +1,2 @@
 # DBM-T
-DBM for Tauri
+DBM with accurate timers for Tauri-Legion
