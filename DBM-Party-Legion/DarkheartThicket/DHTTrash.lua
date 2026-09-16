@@ -11,8 +11,8 @@ mod:RegisterEvents(
 	"SPELL_CAST_START 200580 200630 200768",
 	"SPELL_AURA_APPLIED 204243"
 )
---Todo: Cat Leaps
 
+--TODO: Cat Leaps
 local warnUnnervingScreech				= mod:NewCastAnnounce(200630, 4)
 
 local specWarnPropellingCharge			= mod:NewSpecialWarningDodge(200768, nil, nil, nil, 2, 3)
@@ -49,7 +49,7 @@ function mod:SPELL_AURA_APPLIED(args)
 	local spellId = args.spellId
 	if spellId == 204243 and self:AntiSpam(2, 5) then
 		if not self:IsNormal() then
-			specWarnTormentingEye:Show()
+			specWarnTormentingEye:Show(args.sourceName)
 			specWarnTormentingEye:Play("kickcast")
 		end
 	end

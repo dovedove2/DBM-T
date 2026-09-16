@@ -62,7 +62,7 @@ local timerTormentCD			= mod:NewCDTimer(17, 202615, nil, nil, nil, 7, nil)
 local timerDoubleStrikeCD		= mod:NewCDTimer(12, 193607, nil, "Tank", nil, 3, nil, DBM_CORE_TANK_ICON)
 local timerDoubleStrike			= mod:NewTargetTimer(6, 193607, nil, false, nil, 3, nil)
 
-local timerRoleplay				= mod:NewCombatTimer(26, nil, "Interface\\Icons\\Spell_Holy_BorrowedTime", nil, nil, 7)
+local timerRoleplay				= mod:NewCombatTimer(26, nil, nil, "Interface\\Icons\\Spell_Holy_BorrowedTime")
 
 local yellNightmares			= mod:NewYell(193069)
 local yellTorment				= mod:NewYell(202615)

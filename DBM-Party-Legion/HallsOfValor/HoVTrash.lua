@@ -58,8 +58,8 @@ local countdownEyeofStorm			= mod:NewCountdown(30, 200901, nil, nil, 3)
 local timerRoleplay					= mod:NewCombatTimer(10)
 
 local yellCrackle					= mod:NewYell(199805)
-local yellThunderstrike				= mod:NewYell(215430, nil, nil, nil, "SAY")
-local yellCracklingStorm			= mod:NewYell(198892, nil, nil, nil, "SAY")
+local yellThunderstrike				= mod:NewYell(215430)
+local yellCracklingStorm			= mod:NewYell(198892)
 
 local eyeShortName = DBM:GetSpellInfo(91320)--Inner Eye
 
