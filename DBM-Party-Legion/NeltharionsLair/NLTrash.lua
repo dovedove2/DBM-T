@@ -34,7 +34,7 @@ local specWarnPiercingShards	= mod:NewSpecialWarningSpell(226296, "Tank", nil, n
 
 local timerFrenzy				= mod:NewTargetTimer(8, 201983, nil, "Tank", nil, 3, nil)
 
-local timerRoleplay				= mod:NewTimer(23, "timerRoleplay", "Interface\\Icons\\Spell_Holy_BorrowedTime", nil, nil, 7)
+local timerRoleplay				= mod:NewTimer(22.6, "timerRoleplay", "Interface\\Icons\\Spell_Holy_BorrowedTime", nil, nil, 7)
 
 local yellStoneGaze				= mod:NewYell(202181)
 
@@ -70,7 +70,7 @@ function mod:SPELL_CAST_START(args)
 	elseif spellId == 202181 then
 		self:BossTargetScanner(args.sourceGUID, "StoneGazeTarget", 0.1, 2)
 		if self:CheckInterruptFilter(args.sourceGUID, false, true) then
-			specWarnStoneGaze:Show()
+			specWarnStoneGaze:Show(args.sourceName)
 			specWarnStoneGaze:Play("kickcast")
 		end
 	end
