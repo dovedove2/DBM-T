@@ -1,16 +1,16 @@
 local mod	= DBM:NewMod(1738, "DBM-EmeraldNightmare", nil, 768)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 17471 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 17519 $"):sub(12, -3))
 mod:SetCreatureID(105393)
 mod:SetEncounterID(1873)
 mod:SetZone()
 mod:SetUsedIcons(8, 4, 3, 2, 1)
 mod:SetHotfixNoticeRev(15422)
-mod.respawnTime = 29
+mod.respawnTime = 30
 
 mod:RegisterCombat("combat")
-mod.syncThreshold = 30
+mod.syncThreshold = 31
 
 mod:RegisterEventsInCombat(
 	"SPELL_CAST_START 210931 209471 208697 208929 208689 210781 208685 218415 223121",
@@ -69,7 +69,7 @@ local timerCorruptorTentacleCD		= mod:NewCDTimer(220, "ej13191", nil, nil, nil, 
 local timerNightmareHorrorCD		= mod:NewCDTimer(280, "ej13188", nil, nil, nil, 1, 210289)
 local timerEyeOfFateCD				= mod:NewCDTimer(10, 210984, nil, "Tank", nil, 5, nil, DBM_CORE_TANK_ICON)
 local timerNightmareishFuryCD		= mod:NewNextTimer(10.9, 215234, nil, "Tank", nil, 5, nil, DBM_CORE_TANK_ICON)
-local timerGroundSlamCD				= mod:NewNextTimer(20.5, 208689, nil, nil, nil, 3)
+local timerGroundSlamCD				= mod:NewNextTimer(20, 208689, nil, nil, nil, 3)
 mod:AddTimerLine(ENCOUNTER_JOURNAL_SECTION_FLAG12)
 local timerDeathBlossomCD			= mod:NewNextTimer(105, 218415, nil, nil, nil, 2, nil, DBM_CORE_HEROIC_ICON)
 local timerDeathBlossom				= mod:NewCastTimer(15, 218415, nil, nil, nil, 5, nil, DBM_CORE_DEADLY_ICON)
@@ -109,16 +109,16 @@ local addsTable = {}
 local phase1EasyDeathglares = {26, 62, 85, 55}--Normal/LFR OCT 16
 local phase1HeroicDeathglares = {21, 51.5, 51}--VERIFIED Nov 18
 --This might be same problem as below. Need to review and see if this is another stupid 21/26 variation that makes 2nd one also variable
-local phase1MythicDeathglares = {21, 69, 85, 70}--VERIFIED Oct 27
+local phase1MythicDeathglares = {21, 72.3, 83.5, 70}--VERIFIED Oct 27
 local phase1EasyCorruptors = {86, 95, 35}--Only verifyed 90 on Oct 16 (TODO, verify 95, 35)
 local phase1HeroicCorruptors = {71.5, 60}--VERIFIED Nov 18
-local phase1MythicCorruptors = {88, 95, 50, 45, 20}--VERIFIED Oct 27
-local phase1DeathBlossom = {58.6, 100, 35}--VERIFIED Oct 27
+local phase1MythicCorruptors = {88, 94, 50, 45, 20}--VERIFIED Oct 27
+local phase1DeathBlossom = {60, 99.7, 33.3}--VERIFIED Oct 27
 
 --Based on data, first one is either 21 or 26, if it's 26 then second one changes from 95 to 90
 --Might have to switch to scheduling to fix accuracy of timers 2 and 3 because of the 5 second variation on timer 1
 local phase2ComboDeathglares = {21.5, 90, 130}--Fuck it. i'm not scheduling to fix a 5 second variation, the two lowest times combined
-local phase2MythicDeathglares = {21.5, 90, 115, 20}
+local phase2MythicDeathglares = {21.5, 92, 114, 19}
 --local phase2AllDeathglares = {21.5, 95, 130}--True timers
 --local phase2AltDeathglares = {26.5, 90, 130}--Fucked up timers when first one is late
 --Old shit, when i thought variations were cause of difficulty. They aren't. These tentacles same in all modes apparently
@@ -127,8 +127,8 @@ local phase2MythicDeathglares = {21.5, 90, 115, 20}
 --local phase2HeroicDeathglares = {26.5, 90, 130}--26, 90 verified Oct 16 (130 not verified)
 --These also same in all modes except mythic
 local phase2Corruptors = {45, 95, 35, 85, 40}--verified Oct 16 45, 95, 30 on heroic/LFR/Normal
-local phase2MythicCorruptors = {45, 75, 115, 65}--VERIFIED Oct 27 (fix missing set needed)
-local phase2DeathBlossom = {80, 75}--VERIFIED Oct 16
+local phase2MythicCorruptors = {45, 74, 114, 64}--VERIFIED Oct 27 (fix missing set needed)
+local phase2DeathBlossom = {80, 75, 75}--VERIFIED Oct 16
 local autoMarkScannerActive = false
 local autoMarkBlocked = false
 local autoMarkFilter = {}
@@ -250,11 +250,11 @@ function mod:OnCombatStart(delay)
 	table.wipe(autoMarkFilter)
 	timerNightmareishFuryCD:Start(6-delay)
 	timerGroundSlamCD:Start(12-delay)
-	timerDeathGlareCD:Start(21.5-delay)
+	timerDeathGlareCD:Start(20.2-delay)
 	if self:IsMythic() then
 		self.vb.deathBlossomCount = 0
-		timerDeathBlossomCD:Start(58.6-delay)
-		timerNightmareHorrorCD:Start(60-delay)
+		timerDeathBlossomCD:Start(60.2-delay)
+		timerNightmareHorrorCD:Start(75.5-delay)
 		timerCorruptorTentacleCD:Start(90-delay)--Verify
 	elseif self:IsHeroic() then
 		timerNightmareHorrorCD:Start(52.5-delay)
@@ -373,11 +373,11 @@ function mod:SPELL_CAST_START(args)
 		end
 		local elapsed, total = timerNightmareHorrorCD:GetTime()
 		local remaining = total - elapsed
-		if remaining < 15 then--delayed
-			local extend = 15-remaining
-			DBM:Debug("Delay detected, updating horror timer now. Extend: "..extend)
-			timerNightmareHorrorCD:Update(elapsed, total+extend)
-		end
+		--if remaining < 15 then--delayed
+			--local extend = 15-remaining
+			--DBM:Debug("Delay detected, updating horror timer now. Extend: "..extend)
+			--timerNightmareHorrorCD:Update(elapsed, total+extend)
+		--end
 	elseif spellId == 223121 then
 		if self:IsMythic() then
 			timerFinalTorpor:Start(55)
@@ -425,7 +425,7 @@ function mod:SPELL_AURA_APPLIED(args)
 		end
 		timerDeathGlareCD:Start(21.5)
 		timerCorruptorTentacleCD:Start(45)
-		timerNightmareHorrorCD:Start(95)
+		timerNightmareHorrorCD:Start(95.1)
 		self.vb.phase = self.vb.phase + 1
 		self.vb.DeathglareSpawn = 0
 		self.vb.CorruptorSpawn = 0
@@ -483,7 +483,11 @@ function mod:SPELL_AURA_APPLIED(args)
 	elseif spellId == 215128 then
 		warnCursedBlood:CombinedShow(0.5, args.destName)--Multi target assumed
 		if self:AntiSpam(2, 3) then
-			timerCursedBloodCD:Start()
+			if self:IsMythic() then
+				timerCursedBloodCD:Start(27.1)
+			else
+				timerCursedBloodCD:Start()
+			end
 		end
 		if args:IsPlayer() then
 			specWarnCursedBlood:Show()
@@ -510,7 +514,11 @@ function mod:SPELL_AURA_REMOVED(args)
 		timerCorruptorTentacleCD:Stop()
 		timerNightmareHorrorCD:Stop()
 		timerDeathBlossomCD:Stop()
-		timerCursedBloodCD:Start()
+		if self:IsMythic() then
+			timerCursedBloodCD:Start(23)
+		else
+			timerCursedBloodCD:Start()
+		end
 	elseif spellId == 215128 and args:IsPlayer() then
 		yellCursedBlood:Cancel()
 		if self.Options.RangeFrame then

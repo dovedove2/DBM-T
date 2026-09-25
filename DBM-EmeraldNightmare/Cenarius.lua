@@ -35,6 +35,8 @@ local warnCleansingGround			= mod:NewCastAnnounce(212630, 1)
 --Cenarius
 local specWarnCreepingNightmares	= mod:NewSpecialWarningStack(210279, nil, 16, nil, 2, 1, 6)--Stack warning subject to tuning
 local yellNightmareBrambles			= mod:NewYell(210290, L.BrambleYell)
+local specWarnDreadThorns			= mod:NewSpecialWarningSpell(210346, nil, nil, nil, 2, 3)
+local specWarnDreadThornsEnd		= mod:NewSpecialWarningEnd(210346, nil, nil, nil, 1, 2)
 local specWarnNightmareBramblesNear	= mod:NewSpecialWarningClose(210290, nil, nil, nil, 1, 2)
 local specWarnNightmareBlast		= mod:NewSpecialWarningDefensive(213162, nil, nil, nil, 1, 2)
 local specWarnNightmareBlastOther	= mod:NewSpecialWarningTaunt(213162, nil, nil, nil, 1, 2)
@@ -54,9 +56,9 @@ local yellScornedTouch				= mod:NewYell(211471)
 --Cenarius
 mod:AddTimerLine(L.name)
 local timerNightmareBramblesCD		= mod:NewCDTimer(30, 210290, nil, "-Tank", 2, 3)--On for all, for now. Doesn't target melee but melee still have to be aware. Just not AS aware.
-local timerDreadThornsCD			= mod:NewCDTimer(34, 210346, nil, false, 3, 5, nil, DBM_CORE_TANK_ICON)--Optional but off by default
-local timerNightmareBlastCD			= mod:NewNextTimer(32.5, 213162, nil, "Tank", nil, 5, nil, DBM_CORE_TANK_ICON)
-local timerForcesOfNightmareCD		= mod:NewCDCountTimer(77.6, 212726, nil, nil, nil, 1)--77.8-80
+local timerDreadThornsCD			= mod:NewCDTimer(39.1, 210346, nil, false, 3, 5, nil, DBM_CORE_TANK_ICON)--Optional but off by default
+local timerNightmareBlastCD			= mod:NewNextTimer(32, 213162, nil, "Tank", nil, 5, nil, DBM_CORE_TANK_ICON)
+local timerForcesOfNightmareCD		= mod:NewCDCountTimer(84.1, 212726, nil, nil, nil, 1)--77.8-80
 local timerSpearOfNightmaresCD		= mod:NewCDTimer(18.2, 214529, nil, "Melee|Healer", 3, 5, nil, DBM_CORE_TANK_ICON)
 local timerBeastsOfNightmareCD		= mod:NewCDTimer(30, 214876, nil, nil, 2, 3, nil, DBM_CORE_DEADLY_ICON)
 local timerEntanglingNightmareCD	= mod:NewNextTimer(51, 214505, nil, nil, nil, 1, nil, DBM_CORE_DAMAGE_ICON)
@@ -70,7 +72,7 @@ local timerRottenBreathCD			= mod:NewCDTimer(24.3, 211192, nil, nil, nil, 3)
 local timerDisiccatingStompCD		= mod:NewCDTimer(32, 211073, nil, nil, nil, 2, nil, DBM_CORE_HEALER_ICON)
 
 --Cenarius
-local countdownForcesOfNightmare	= mod:NewCountdown(78.8, 212726)
+local countdownForcesOfNightmare	= mod:NewCountdown(84.1, 212726)
 local countdownNightmareBrambles	= mod:NewCountdown("AltTwo30", 210290, "Ranged")--Never once saw this target melee
 local countdownNightmareBlast		= mod:NewCountdown("Alt32", 213162, "Tank")
 local countdownSpearOfNightmares	= mod:NewCountdown("Alt18", 214529, "Melee", 2)
@@ -101,9 +103,9 @@ function mod:OnCombatStart(delay)
 	self.vb.phase = 1
 	self.vb.addsCount = 0
 	self.vb.sisterCount = 0
-	timerForcesOfNightmareCD:Start(7.2-delay, 1)--7.2-8.6
-	countdownForcesOfNightmare:Start(7.2-delay)
-	timerDreadThornsCD:Start(14-delay)
+	timerForcesOfNightmareCD:Start(6.5-delay, 1)
+	countdownForcesOfNightmare:Start(6.5-delay)
+	timerDreadThornsCD:Start(12.6-delay)
 	timerNightmareBramblesCD:Start(27.5-delay)--Cast finish. Cast start is actually a yell and not worth using anyways since DBM doesn't warn spawn point until cast finish
 	countdownNightmareBrambles:Start(27.5-delay)
 	if self:IsMythic() then
@@ -205,8 +207,8 @@ end
 function mod:SPELL_AURA_APPLIED(args)
 	local spellId = args.spellId
 	if spellId == 210346 then
---		specWarnDreadThorns:Show()
---		specWarnDreadThorns:Play("bossout")
+		specWarnDreadThorns:Show()
+		specWarnDreadThorns:Play("bossout")
 	elseif spellId == 211368 then
 		specWarnTouchofLifeDispel:Show(args.destName)
 		if self.Options.SpecWarn211368dispel then
@@ -233,6 +235,7 @@ end
 function mod:SPELL_AURA_REMOVED(args)
 	local spellId = args.spellId
 	if spellId == 210346 then
+		specWarnDreadThornsEnd:Show()
 		timerDreadThornsCD:Start()
 	end
 end
@@ -252,9 +255,9 @@ function mod:INSTANCE_ENCOUNTER_ENGAGE_UNIT()
 					DBM.RangeCheck:Show(8)
 				end
 			elseif cid == 105494 then--Rotten Drake
-				timerRottenBreathCD:Start(18.1, GUID)
+				timerRottenBreathCD:Start(18.5, GUID)
 			elseif cid == 105468 then--Nightmare Ancient
-				timerDisiccatingStompCD:Start(18.1, GUID)
+				timerDisiccatingStompCD:Start(18.5, GUID)
 			end
 		end
 	end

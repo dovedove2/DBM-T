@@ -1,13 +1,13 @@
 local mod	= DBM:NewMod(1726, "DBM-EmeraldNightmare", nil, 768)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 17440 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 17518 $"):sub(12, -3))
 mod:SetCreatureID(103769)
 mod:SetEncounterID(1864)
 mod:SetZone()
 mod:SetUsedIcons(6, 2, 1)
 mod:SetHotfixNoticeRev(15369)
-mod.respawnTime = 15
+mod.respawnTime = 30
 
 mod:RegisterCombat("combat")
 
@@ -48,6 +48,7 @@ local yellDescentIntoMadness			= mod:NewFadesYell(208431)
 local specWarnDreaming					= mod:NewSpecialWarningCount(205843, nil, nil, nil, 1, 2)--Mythic
 --Stage One: The Decent Into Madness
 local specWarnNightmareBlades			= mod:NewSpecialWarningMoveAway(206656, nil, nil, nil, 1, 2)
+local yellNightmareBlades				= mod:NewYell(206656)
 local specWarnCorruptionHorror			= mod:NewSpecialWarningSwitchCount("ej12973", "-Healer", nil, nil, 1, 2)
 local specWarnCorruptingNova			= mod:NewSpecialWarningSpell(207830, nil, nil, nil, 2, 2)
 local specWarnDarkeningSoulYou			= mod:NewSpecialWarningStack(206651, nil, 3, nil, 2, 1, 6)
@@ -66,17 +67,17 @@ local specWarnInconHorror				= mod:NewSpecialWarningSwitch("ej13162", "-Healer",
 
 --Stage One: The Decent Into Madness
 mod:AddTimerLine(SCENARIO_STAGE:format(1))
-local timerDarkeningSoulCD				= mod:NewCDTimer(7, 206651, nil, "Healer|Tank", nil, 5, nil, DBM_CORE_MAGIC_ICON..DBM_CORE_TANK_ICON)
-local timerNightmareBladesCD			= mod:NewNextTimer(15.7, 206656, nil, "-Tank", 2, 3)
-local timerLurkingEruptionCD			= mod:NewCDCountTimer(20.5, 208322, nil, "-Tank", 2, 3)
+local timerDarkeningSoulCD				= mod:NewCDTimer(8, 206651, nil, "Healer|Tank", nil, 5, nil, DBM_CORE_MAGIC_ICON..DBM_CORE_TANK_ICON)
+local timerNightmareBladesCD			= mod:NewNextTimer(15.5, 206656, nil, "-Tank", 2, 3)
+local timerLurkingEruptionCD			= mod:NewCDCountTimer(19.6, 208322, nil, "-Tank", 2, 3)
 local timerCorruptionHorrorCD			= mod:NewNextCountTimer(82.5, 210264, nil, nil, nil, 1, nil, DBM_CORE_DAMAGE_ICON)
 local timerCorruptingNovaCD				= mod:NewNextTimer(20, 207830, nil, nil, nil, 2)
 local timerTormentingSwipeCD			= mod:NewCDTimer(10, 224649, nil, "Tank", nil, 5, nil, DBM_CORE_TANK_ICON)
 --Stage Two: From the Shadows
 mod:AddTimerLine(SCENARIO_STAGE:format(2))
-local timerBondsOfTerrorCD				= mod:NewCDTimer(14.1, 209034, nil, "-Tank", 2, 3)
+local timerBondsOfTerrorCD				= mod:NewCDTimer(14.5, 209034, nil, "-Tank", 2, 3)
 local timerCorruptionMeteorCD			= mod:NewCDCountTimer(28, 206308, 57467, nil, nil, 3, nil, DBM_CORE_DEADLY_ICON)--Short text "meteor"
-local timerBlackeningSoulCD				= mod:NewCDTimer(7.2, 209158, nil, "Healer|Tank", nil, 5, nil, DBM_CORE_MAGIC_ICON..DBM_CORE_TANK_ICON)
+local timerBlackeningSoulCD				= mod:NewCDTimer(8, 209158, nil, "Healer|Tank", nil, 5, nil, DBM_CORE_MAGIC_ICON..DBM_CORE_TANK_ICON)
 local timerNightmareInfusionCD			= mod:NewCDTimer(61.5, 209443, nil, "Tank", nil, 5, nil, DBM_CORE_TANK_ICON)--61.5-62.5
 local timerCallOfNightmaresCD			= mod:NewCDTimer(40, 205588, nil, nil, nil, 1, nil, DBM_CORE_DAMAGE_ICON)
 --Stage Three: Darkness and stuff
@@ -96,7 +97,7 @@ mod:AddRangeFrameOption(6, 208322)
 mod:AddSetIconOption("SetIconOnBlades", 206656)
 mod:AddSetIconOption("SetIconOnMeteor", 206308)
 
-local lurkingTimers = {17, 20.5, 41, 20.5, 20.5}--{13.6, 26.3, 47.4, 20.7, 25.9} old. TODO, get more data, if all but one are 20.5, just code smarter without table
+local lurkingTimers = {17, 19.6, 40, 19.6, 19.6, 40}--TODO, get more data, if all but one are 19.6, just code smarter without table
 local corruptionName = DBM:EJ_GetSectionInfo(12970)
 local darkSoul, blackSoul, dreamDebuff, blackened = DBM:GetSpellInfo(206651), DBM:GetSpellInfo(209158), DBM:GetSpellInfo(206005), DBM:GetSpellInfo(205612)
 local bladesTarget = {}
@@ -157,11 +158,11 @@ function mod:OnCombatStart(delay)
 	self.vb.lastBonds = nil
 	table.wipe(bladesTarget)
 	table.wipe(gatherTarget)
-	timerDarkeningSoulCD:Start(-delay)
-	timerLurkingEruptionCD:Start(13.6-delay, 1)
-	timerNightmareBladesCD:Start(18.5-delay)
-	timerCorruptionHorrorCD:Start(58.4-delay, 1)
-	countdownCorruptionHorror:Start(58.4)
+	timerDarkeningSoulCD:Start(7-delay)
+	timerLurkingEruptionCD:Start(17.1-delay, 1)
+	timerNightmareBladesCD:Start(18.3-delay)
+	timerCorruptionHorrorCD:Start(57.1-delay, 1)
+	countdownCorruptionHorror:Start(57.1)
 	if self.Options.InfoFrame then
 		DBM.InfoFrame:SetHeader(corruptionName)
 		if self.Options.InfoFrameFilterDream then
@@ -242,7 +243,7 @@ function mod:SPELL_SUMMON(args)
 	local spellId = args.spellId
 	if spellId == 210264 then
 		timerTormentingSwipeCD:Start(10, args.destGUID)
-		timerCorruptingNovaCD:Start(14.5, args.destGUID)
+		timerCorruptingNovaCD:Start(20, args.destGUID)
 	end
 end
 
@@ -328,6 +329,7 @@ function mod:SPELL_AURA_APPLIED(args)
 			bladesTarget[#bladesTarget+1] = args.destName
 		end
 		if args:IsPlayer() then
+			yellNightmareBlades:Yell()
 			specWarnNightmareBlades:Show()
 			specWarnNightmareBlades:Play("runout")
 		end
@@ -461,20 +463,21 @@ function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, spellGUID)
 		if timers then
 			timerLurkingEruptionCD:Start(timers, self.vb.lurkingCount+1)
 		else
-			timerLurkingEruptionCD:Start(20.5, self.vb.lurkingCount+1)
+			timerLurkingEruptionCD:Start(19.6, self.vb.lurkingCount+1)
 		end
 	elseif spellId == 226193 then--Xavius Energize Phase 2
 		self.vb.phase = 2
 		warnPhase2:Show()
 		warnPhase2:Play("ptwo")
+		timerDarkeningSoulCD:Stop()
 		timerNightmareBladesCD:Stop()
 		timerLurkingEruptionCD:Stop()
 		timerCorruptionHorrorCD:Stop()
 		countdownCorruptionHorror:Cancel()
 		timerBlackeningSoulCD:Start(7)
-		timerBondsOfTerrorCD:Start(14)
-		timerCorruptionMeteorCD:Start(21, 1)
-		countdownMeteor:Start(21)
+		timerBondsOfTerrorCD:Start(15.5)
+		timerCorruptionMeteorCD:Start(28, 1)
+		countdownMeteor:Start(28)
 		timerCallOfNightmaresCD:Start(23, 1)
 		countdownCallOfNightmares:Start(23)
 		timerNightmareInfusionCD:Start(30)

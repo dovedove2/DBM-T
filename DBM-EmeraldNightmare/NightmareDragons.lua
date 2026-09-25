@@ -1,19 +1,19 @@
 local mod	= DBM:NewMod(1704, "DBM-EmeraldNightmare", nil, 768)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 17440 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 17519 $"):sub(12, -3))
 mod:SetCreatureID(102679)--Ysondre, 102683 (Emeriss), 102682 (Lethon), 102681 (Taerar)
 mod:SetEncounterID(1854)
 mod:SetZone()
 mod:SetUsedIcons(8, 7, 6, 5, 4, 3, 2, 1)
 mod:SetHotfixNoticeRev(15407)
-mod.respawnTime = 39
+mod.respawnTime = 39.2
 
 mod:RegisterCombat("combat")
 
 mod:RegisterEventsInCombat(
 	"SPELL_CAST_START 203028 204767 205300 203817 203888 204100 204078 214540 207573",
-	"SPELL_CAST_SUCCESS 203787 205298 205329",
+	"SPELL_CAST_SUCCESS 203787 205298 205329 204078",
 	"SPELL_AURA_APPLIED 203102 203125 203124 203121 203110 203770 203787 204040",
 	"SPELL_AURA_APPLIED_DOSE 203102 203125 203124 203121",
 	"SPELL_AURA_REMOVED 203787 204040 203787",
@@ -32,6 +32,7 @@ local Taerar = DBM:EJ_GetSectionInfo(12774)
 --TODO, if only one volatile infection goes out at a time, hide general alert if player affected
 --TODO, remove combined show from any warnings that are only one target
 --TODO, when timers are more finalized add countdowns to more things.
+--todo, fix breath timers
 --All
 local warnSlumberingNightmare		= mod:NewTargetAnnounce(203110, 4, nil, false)--An option to announce fuckups
 local warnBreath					= mod:NewSpellAnnounce(203028, 2)
@@ -66,15 +67,15 @@ local specWarnShadowBurst			= mod:NewSpecialWarningYou(204040, nil, nil, nil, 1,
 local yellShadowBurst				= mod:NewFadesYell(204040, nil, false, 2)
 --Taerar
 local specWarnShadesOfTaerar		= mod:NewSpecialWarningSwitch(204100, "Tank", nil, nil, 1, 2)
-local specWarnBellowingRoar			= mod:NewSpecialWarningSpell(204078, nil, nil, nil, 2, 6)
+local specWarnBellowingRoar			= mod:NewSpecialWarningSoon(204078, nil, nil, nil, 2, 6)
 
 --All
 local timerMarkCD					= mod:NewNextTimer(7, "ej12809", 28836, false, 2, 3, 203102)--Now off by default, to further reduce timer clutter, plus sometimes it's wrong because in rare cases the dragons desync for some reason
-local timerBreathCD					= mod:NewCDSourceTimer(27, 203028, 21131, "Tank", nil, 5, nil, DBM_CORE_TANK_ICON)--27-34 for Ysondre, Cohorts 27-29.
+local timerBreathCD					= mod:NewCDSourceTimer(29, 203028, 21131, "Tank", nil, 5, nil, DBM_CORE_TANK_ICON)--27-34 for Ysondre, Cohorts 27-29.
 --Ysondre
 mod:AddTimerLine(Ysondre)
-local timerNightmareBlastCD			= mod:NewCDTimer(15, 203153, nil, "-Tank", nil, 3)--15-20
-local timerDefiledSpiritCD			= mod:NewCDTimer(33.2, 207573, nil, nil, nil, 3)
+local timerNightmareBlastCD			= mod:NewCDTimer(16, 203153, nil, "-Tank", nil, 3)--15-20
+local timerDefiledSpiritCD			= mod:NewCDTimer(34, 207573, nil, nil, nil, 3)
 --Emeriss
 mod:AddTimerLine(Emeriss)
 local timerVolatileInfectionCD		= mod:NewCDTimer(45.4, 203787, nil, "-Tank", 2, 3)
@@ -87,7 +88,7 @@ local timerShadowBurstCD			= mod:NewNextTimer(14.5, 204040, nil, nil, nil, 3)--A
 mod:AddTimerLine(Taerar)
 local timerShadesOfTaerarCD			= mod:NewNextTimer(48.5, 204100, nil, "-Healer", nil, 1)
 local timerSeepingFogCD				= mod:NewCDTimer(15.5, 205341, nil, false, 2, 3, 24814)--Spawn pretty often, and timers don't help dodge, so now off by default
-local timerBellowingRoarCD			= mod:NewCDTimer(44.5, 204078, 118699, nil, nil, 2)--Air
+local timerBellowingRoarCD			= mod:NewCDTimer(44.9, 204078, 118699, nil, nil, 2)--Air
 
 --Taerar
 local countdownShadesOfTaerar		= mod:NewCountdown(48.5, 204100, "Tank")
@@ -124,10 +125,10 @@ local function whoDatUpThere(self)
 
 	end
 	if not lethonFound then -- Lethon
-		timerShadowBurstCD:Start(12.6)
+		timerShadowBurstCD:Start(14.5)
 	end
 	if not taerarFound then -- Taerar
-		timerBellowingRoarCD:Start(43)
+		timerBellowingRoarCD:Start(49)
 	end
 end
 
@@ -205,7 +206,7 @@ function mod:OnCombatStart(delay)
 		"INSTANCE_ENCOUNTER_ENGAGE_UNIT"--We register here to make sure we wipe vb.on pull
 	)
 	timerBreathCD:Start(15.5, Ysondre)
-	timerDefiledSpiritCD:Start(30-delay)
+	timerDefiledSpiritCD:Start(31-delay)
 	timerNightmareBlastCD:Start(40-delay)--40 on mythic, it changing on heroic too is assumed. Was 22.5 before
 	if self:IsMythic() then
 		--Only done on mythic for now since we know for sure what dragons are up once we know what dragons are down.
@@ -266,7 +267,7 @@ function mod:SPELL_CAST_START(args)
 	elseif spellId == 204078 then
 		specWarnBellowingRoar:Show()
 		specWarnBellowingRoar:Play("fearsoon")
-		self:SendSync("Fear")
+		--self:SendSync("Fear")
 	end
 end
 
@@ -287,6 +288,8 @@ function mod:SPELL_CAST_SUCCESS(args)
 			end
 		end
 		self.vb.alternateOozes = not self.vb.alternateOozes
+	elseif spellId == 204078 then
+		self:SendSync("Fear")
 	elseif spellId == 205329 then
 		warnGloom:Show()
 	end
@@ -373,17 +376,17 @@ function mod:INSTANCE_ENCOUNTER_ENGAGE_UNIT()
 			--Subtracking .5 from all timers do to slight delay in IEEU vs ENCOUNTER_START
 			if cid == 102683 then -- Emeriss
 				timerBreathCD:Start(15.5, bossName)
-				timerVolatileInfectionCD:Start(19.5)
+				timerVolatileInfectionCD:Start(20.9)
 				timerEssenceOfCorruptionCD:Start(29.5)
 			elseif cid == 102682 then -- Lethon
 				timerShadowBurstCD:Stop()
 				timerBreathCD:Start(13, bossName)
-				timerSiphonSpiritCD:Start(20.5)
+				timerSiphonSpiritCD:Start(25.6)
 			elseif cid == 102681 then -- Taerar
 				timerBellowingRoarCD:Stop()
 				timerBreathCD:Start(17, bossName)
-				timerShadesOfTaerarCD:Start(19.5)--19.5-21
-				countdownShadesOfTaerar:Start(19.5)
+				timerShadesOfTaerarCD:Start(25)--19.5-21
+				countdownShadesOfTaerar:Start(25)
 				timerSeepingFogCD:Start(25)
 			end
 			self:SendSync("IEEU", bossName, unitGUID)
@@ -460,12 +463,12 @@ function mod:OnSync(msg, targetName, guid)
 		elseif cid == 102682 then -- Lethon
 			timerShadowBurstCD:Stop()
 			timerBreathCD:Start(13, targetName)
-			timerSiphonSpiritCD:Start(20.5)
+			timerSiphonSpiritCD:Start(25.6)
 		elseif cid == 102681 then -- Taerar
 			timerBellowingRoarCD:Stop()
 			timerBreathCD:Start(17, targetName)
-			timerShadesOfTaerarCD:Start(19.5)--19.5-21
-			countdownShadesOfTaerar:Start(19.5)
+			timerShadesOfTaerarCD:Start(25)--19.5-21
+			countdownShadesOfTaerar:Start(25)
 			timerSeepingFogCD:Start(25)
 		end
 	elseif msg == "Shades" then

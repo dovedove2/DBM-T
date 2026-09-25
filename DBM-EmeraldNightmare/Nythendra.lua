@@ -1,13 +1,13 @@
 local mod	= DBM:NewMod(1703, "DBM-EmeraldNightmare", nil, 768)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 17440 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 17518 $"):sub(12, -3))
 mod:SetCreatureID(102672)
 mod:SetEncounterID(1853)
 mod:SetZone()
 mod:SetUsedIcons(4, 3, 2, 1)
 mod:SetHotfixNoticeRev(15286)
-mod.respawnTime = 30
+mod.respawnTime = 29.5
 
 mod:RegisterCombat("combat")
 
@@ -44,18 +44,18 @@ local specWarnInfestedMind			= mod:NewSpecialWarningSwitch(205043, "Dps", nil, n
 local specWarnSpreadInfestation		= mod:NewSpecialWarningInterrupt(205070, "HasInterrupt", nil, nil, 1, 2)
 local specWarnInfestedStack			= mod:NewSpecialWarningStack(204504, nil, 7, nil, 2, 1, 6)
 
-local timerBreathCD					= mod:NewCDCountTimer(36, 202977, nil, nil, nil, 3)--36-42
-local timerVolatileRotCD			= mod:NewCDCountTimer(20.5, 204463, nil, "Tank", nil, 5, nil, DBM_CORE_TANK_ICON)--20.5-24 variation non mythic. 22-30 mythic
-local timerRotCD					= mod:NewCDCountTimer(15.3, 203096, nil, nil, nil, 3)
-local timerSwarm					= mod:NewBuffActiveTimer(23, 203552, nil, nil, nil, 6)
+local timerBreathCD					= mod:NewCDCountTimer(38, 202977, nil, nil, nil, 3)--36-42
+local timerVolatileRotCD			= mod:NewCDCountTimer(23, 204463, nil, "Tank", nil, 5, nil, DBM_CORE_TANK_ICON)--20.5-24 variation non mythic. 22-30 mythic
+local timerRotCD					= mod:NewCDCountTimer(15.7, 203096, nil, nil, nil, 3)
+local timerSwarm					= mod:NewBuffActiveTimer(23.9, 203552, nil, nil, nil, 6)
 local timerSwarmCD					= mod:NewCDCountTimer(98, 203552, nil, nil, nil, 6)--Needs new sample size
 mod:AddTimerLine(ENCOUNTER_JOURNAL_SECTION_FLAG12)
-local timerInfestingMindCD			= mod:NewNextTimer(10, 205043, nil, nil, nil, 3, nil, DBM_CORE_HEROIC_ICON)--36-42
+local timerInfestingMindCD			= mod:NewNextTimer(12.5, 205043, nil, nil, nil, 3, nil, DBM_CORE_HEROIC_ICON)--36-42
 
 local berserkTimer					= mod:NewBerserkTimer(600)
 
-local countdownBreath				= mod:NewCountdown(36, 202977, false)--Can't in good concious have a countdown on by default for something with a 6 second variation
-local countdownVolatileRot			= mod:NewCountdown("Alt20.5", 204463, false)--Same deal as above
+local countdownBreath				= mod:NewCountdown(38, 202977, false)--Can't in good concious have a countdown on by default for something with a 6 second variation
+local countdownVolatileRot			= mod:NewCountdown("Alt23", 204463, false)--Same deal as above
 local countdownRot					= mod:NewCountdownFades("Alt5", 203096)
 
 mod:AddSetIconOption("SetIconOnRot", 203096)--Of course I'll probably be forced to change method when BW does their own thing, for compat.
@@ -85,12 +85,16 @@ function mod:OnCombatStart(delay)
 	self.vb.volatileRotCast = 0
 	self.vb.swarmCast = 0
 	--Only start timers if boss isn't starting at 0 energy
-	timerRotCD:Start(5.2-delay, 1)
-	timerVolatileRotCD:Start(20-delay, 1)--20-25.8
-	countdownVolatileRot:Start(20-delay)
-	timerBreathCD:Start(35-delay, 1)--35-40
-	countdownBreath:Start(35-delay)
-	timerSwarmCD:Start(86-delay, 1)--86-91
+	timerRotCD:Start(5.5-delay, 1)
+	timerVolatileRotCD:Start(22.9-delay, 1)--20-25.8
+	countdownVolatileRot:Start(22.9-delay)
+	timerBreathCD:Start(38-delay, 1)--35-40
+	countdownBreath:Start(38-delay)
+	if self:IsMythic() then
+		timerSwarmCD:Start(94.6-delay, 1)
+	else
+		timerSwarmCD:Start(90-delay, 1)--86-91
+	end
 	if self:IsEasy() then
 		berserkTimer:Start(-delay)
 	else
@@ -153,13 +157,8 @@ function mod:SPELL_CAST_SUCCESS(args)
 	if spellId == 204463 then
 		self.vb.volatileRotCast = self.vb.volatileRotCast + 1
 		if self.vb.volatileRotCast < 3 then
-			if self:IsMythic() then
-				timerVolatileRotCD:Start(22, self.vb.volatileRotCast+1)
-				countdownVolatileRot:Start(22)
-			else
 				timerVolatileRotCD:Start(nil, self.vb.volatileRotCast+1)
 				countdownVolatileRot:Start()
-			end
 		end
 	end
 end
@@ -253,11 +252,11 @@ function mod:SPELL_AURA_REMOVED(args)
 		self.vb.breathCount = 0
 		self.vb.rotCast = 0
 		self.vb.volatileRotCast = 0
-		timerRotCD:Start(12, 1)
-		timerVolatileRotCD:Start(28, 1)--28-31
-		countdownVolatileRot:Start(28)
-		timerBreathCD:Start(43, 1)
-		countdownBreath:Start(43)
+		timerRotCD:Start(12.5, 1)
+		timerVolatileRotCD:Start(29.2, 1)--28-31
+		countdownVolatileRot:Start(29.2)
+		timerBreathCD:Start(44.6, 1)
+		countdownBreath:Start(44.6)
 		timerSwarmCD:Start(nil, self.vb.swarmCast+1)
 	elseif spellId == 204504 and args:IsPlayer() then
 		playerHasTen = false
@@ -285,7 +284,11 @@ function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, spellGUID)
 	if spellId == 203095 then--CAST Doesn't show in combat log for some reason. Applied does but don't want to risk misses
 		self.vb.rotCast = self.vb.rotCast + 1
 		if self.vb.rotCast < 5 then
-			timerRotCD:Start(nil, self.vb.rotCast+1)
+			if self:IsMythic() and self.vb.rotCast+1 == 4 then
+				timerRotCD:Start(21.2, self.vb.rotCast+1)
+			else
+				timerRotCD:Start(nil, self.vb.rotCast+1)
+			end
 		end
 	elseif spellId == 202968 then--Infested Breath (CAST_SUCCESS and CAST_START pruned from combat log)
 		self.vb.breathCount = self.vb.breathCount + 1

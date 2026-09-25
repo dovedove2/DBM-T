@@ -10,7 +10,7 @@ mod:SetHotfixNoticeRev(15357)
 
 mod:RegisterCombat("combat")
 mod:RegisterEventsInCombat(
-	"SPELL_CAST_START 212707 210948 210547 215288 210308 210326 215582",
+	"SPELL_CAST_START 212707 210948 210547 215288 210308 210326 215582 218124",
 	"SPELL_CAST_SUCCESS 210864 215443 218630 218124",
 	"SPELL_AURA_APPLIED 212514 218124 218629 215582 215307 215300",
 	"SPELL_AURA_APPLIED_DOSE 212512 215582",
@@ -53,6 +53,7 @@ local specWarnRazorWing				= mod:NewSpecialWarningDodge(210547, nil, nil, nil, 3
 local specWarnRakingTalon			= mod:NewSpecialWarningDefensive(215582, nil, nil, nil, 1, 2)
 local specWarnRakingTalonOther		= mod:NewSpecialWarningTaunt(215582, nil, nil, nil, 1, 2)
 ----Mythic
+local specViolentWinds2				= mod:NewSpecialWarningSpell(218124, nil, nil, nil, 2, 2)
 local specViolentWinds				= mod:NewSpecialWarningYou(218124, nil, nil, nil, 3, 2)
 local yellViolentWinds				= mod:NewYell(218124)
 
@@ -67,12 +68,12 @@ local timerNightmareSpawnCD			= mod:NewNextTimer(10, 218630, nil, nil, nil, 1, n
 mod:AddTimerLine(DBM:GetSpellInfo(210308))
 local timerRocFormCD				= mod:NewNextTimer(47, 210308, nil, nil, nil, 6)
 local timerGatheringCloudsCD		= mod:NewNextTimer(15.8, 212707, nil, nil, nil, 2)
-local timerDarkStormCD				= mod:NewNextTimer(26, 210948, nil, nil, nil, 2)
+local timerDarkStormCD				= mod:NewNextTimer(26.7, 210948, nil, nil, nil, 2)
 local timerTwistingShadowsCD		= mod:NewNextCountTimer(21.5, 210864, nil, nil, nil, 3)
 local timerRazorWingCD				= mod:NewNextTimer(32.5, 210547, nil, nil, nil, 3)
 local timerRakingTalonsCD			= mod:NewCDCountTimer(32, 215582, nil, "Tank", nil, 5, nil, DBM_CORE_TANK_ICON)
 mod:AddTimerLine(ENCOUNTER_JOURNAL_SECTION_FLAG12)
-local timerViolentWindsCD			= mod:NewNextTimer(40.5, 218124, nil, nil, nil, 5, nil, DBM_CORE_HEROIC_ICON..DBM_CORE_TANK_ICON)
+local timerViolentWindsCD			= mod:NewNextTimer(40, 218124, nil, nil, nil, 5, nil, DBM_CORE_HEROIC_ICON..DBM_CORE_TANK_ICON)
 
 local berserkTimer					= mod:NewBerserkTimer(540)
 
@@ -144,8 +145,8 @@ function mod:OnCombatStart(delay)
 	timerNecroticVenomCD:Start(12.2-delay, 1)
 	countdownNecroticVenom:Start(12.2)
 	timerFeedingTimeCD:Start(15.5-delay, 1)
-	timerRocFormCD:Start(90-delay)--Some variation expected. I've seen 90-92. Always happens with energy based bosses
-	countdownPhase:Start(90-delay)
+	timerRocFormCD:Start(93.7-delay)--Some variation expected. I've seen 90-92. Always happens with energy based bosses
+	countdownPhase:Start(93.7-delay)
 	berserkTimer:Start(-delay)--540 heroic, other difficulties not confirmed
 	self.vb.platformCount = 1
 	self.vb.ViolentWindsPlat = false
@@ -176,6 +177,13 @@ function mod:SPELL_CAST_START(args)
 		end
 		if self.vb.ViolentWindsPlat and self.vb.talonsCast < 2 or self.vb.talonsCast < 3 then
 			timerRakingTalonsCD:Start(self.vb.ViolentWindsPlat and 46 or 32.5, self.vb.talonsCast+1)
+		end
+	elseif spellId == 218124 then
+		self.vb.windsCast = self.vb.windsCast + 1
+		specViolentWinds2:Show()
+		specViolentWinds2:Play("justrun")
+		if self.vb.windsCast == 1 then
+			timerViolentWindsCD:Start()
 		end
 	elseif spellId == 210326 then--Spider Form
 		DBM:Debug("CLEU: Spider Form Cast")
@@ -215,11 +223,11 @@ function mod:SPELL_CAST_SUCCESS(args)
 	elseif spellId == 218630 then
 		warnNightmareSpawn:Show()
 		timerNightmareSpawnCD:Start()
-	elseif spellId == 218124 then
-		self.vb.windsCast = self.vb.windsCast + 1
-		if self.vb.windsCast == 1 then
-			timerViolentWindsCD:Start()
-		end
+	--elseif spellId == 218124 then
+	--	self.vb.windsCast = self.vb.windsCast + 1
+	--	if self.vb.windsCast == 1 then
+	--		timerViolentWindsCD:Start()
+	--	end
 	end
 end
 
@@ -328,9 +336,9 @@ function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, spellGUID)
 		countdownPhase:Start(132)--132-135 (used to be 127, so keep an eye on it)
 		if self:IsMythic() and self.vb.platformCount == 2 then--Only happens platform 2, platform 4 (roc form second cast behaves like non mythic
 			self.vb.ViolentWindsPlat = true
-			timerViolentWindsCD:Start(56)--50 plus 6 second cast
-			timerRakingTalonsCD:Start(66, 1)
-			timerRazorWingCD:Start(73, 1)
+			timerViolentWindsCD:Start(56)--50
+			timerRakingTalonsCD:Start(73, 1)
+			timerRazorWingCD:Start(74.2, 1) --fix this timer if raking talons goes off first
 		else
 			timerRakingTalonsCD:Start(52, 1)
 			timerRazorWingCD:Start(59, 1)
