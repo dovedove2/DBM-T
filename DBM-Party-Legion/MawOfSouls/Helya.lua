@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(1663, "DBM-Party-Legion", 8, 727)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 17077 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 17519 $"):sub(12, -3))
 mod:SetCreatureID(96759)
 mod:SetEncounterID(1824)
 mod:SetZone()
@@ -31,11 +31,13 @@ local timerTaintofSeaCD					= mod:NewCDTimer(12, 197262, nil, false, nil, 3)
 local timerPiercingTentacleCD			= mod:NewNextTimer(16.3, 197596, nil, false, nil, 3)
 --local timerDestructorTentacleCD		= mod:NewCDTimer(26, "ej12364", nil, nil, nil, 1)--More data
 local timerSubmerged					= mod:NewBuffFadesTimer(15, 196947, nil, nil, nil, 6)
+local timerSubmerged2					= mod:NewCDTimer(74, 196947, nil, nil, nil, 6)
 local timerBreathCD						= mod:NewNextTimer(22, 227233, nil, nil, nil, 3)
 local timerTorrentCD					= mod:NewCDTimer(9.2, 198495, nil, nil, nil, 4, nil, DBM_CORE_INTERRUPT_ICON)--often delayed and after breath so often will see 12-14
 
 local countdownBrackwaterBarrage		= mod:NewCountdown(23, 202088, nil, nil, 5)
 local countdownBreath					= mod:NewCountdown(22, 227233)
+local countdownSubmerged				= mod:NewCountdown("Alt74", 196947, nil, nil, 5)
 
 mod.vb.phase = 1
 
@@ -100,6 +102,8 @@ function mod:SPELL_AURA_REMOVED(args)
 		specWarnSubmergedOver:Show()
 		timerBreathCD:Start(21)
 		countdownBreath:Start(21)
+		timerSubmerged2:Start()
+		countdownSubmerged:Start()
 	end
 end
 
