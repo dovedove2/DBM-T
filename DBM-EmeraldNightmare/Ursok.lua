@@ -221,10 +221,10 @@ function mod:SPELL_AURA_APPLIED(args)
 			--Taunting is safe now because your rend flesh will vanish (or is already gone), and not be cast again, before next overwhelm
 			local rendCooldown = timerRendFleshCD:GetRemaining(self.vb.rendCount+1) or 0
 			local _, _, _, _, _, _, expireTime = UnitDebuff("player", rendFlesh)
-			if rendCooldown > 10 and (not expireTime or expireTime and expireTime-GetTime() < 10) then
+			--if rendCooldown > 10 and (not expireTime or expireTime and expireTime-GetTime() < 10) then
 				specWarnOverwhelmOther:Show(args.destName)
 				specWarnOverwhelmOther:Play("tauntboss")
-			end
+			--end
 		end
 	elseif spellId == 198388 then
 		warnBloodFrenzy:Show()
