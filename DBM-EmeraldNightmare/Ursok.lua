@@ -33,7 +33,7 @@ local yellFocusedGaze				= mod:NewPosYell(198006)
 local specWarnRoaringCacophony		= mod:NewSpecialWarningCount(197969, nil, nil, nil, 2, 2)--Don't know what voice to give it yet, aesoon used for now
 local specWarnMiasma				= mod:NewSpecialWarningMove(205611, nil, nil, nil, 1, 2)
 local specWarnRendFlesh				= mod:NewSpecialWarningDefensive(197942, "Tank", nil, nil, 3, 2)
-local specWarnRendFleshOther		= mod:NewSpecialWarningTaunt(197942, nil, nil, nil, 3, 2)
+local specWarnRendFleshOther		= mod:NewSpecialWarningTaunt(197942, nil, nil, nil, 1, 2)
 local specWarnOverwhelmOther		= mod:NewSpecialWarningTaunt(197943, nil, nil, nil, 1, 2)
 
 local timerFocusedGazeCD			= mod:NewNextCountTimer(40, 198006, nil, nil, nil, 3)
