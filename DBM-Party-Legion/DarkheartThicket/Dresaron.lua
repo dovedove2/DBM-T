@@ -20,7 +20,7 @@ mod:RegisterEventsInCombat(
 local warnRoar						= mod:NewSpellAnnounce(199389, 2)
 
 local specWarnDownDraft				= mod:NewSpecialWarningSpell(199345, nil, nil, nil, 2, 2)
-local specWarnBreath				= mod:NewSpecialWarningDodge(199332, "Tank", nil, nil, 1, 2)
+local specWarnBreath				= mod:NewSpecialWarningDodge(199332, nil, nil, nil, 1, 2)
 --local yellBreath					= mod:NewYell(199332)
 local specWarnFallingRocks			= mod:NewSpecialWarningMove(199460, nil, nil, nil, 2, 2)
 

@@ -79,7 +79,7 @@ local berserkTimer					= mod:NewBerserkTimer(540)
 
 local countdownPhase				= mod:NewCountdown(30, 155005)
 --Spider Form
-local countdownNecroticVenom		= mod:NewCountdown("AltTwo21", 215443)
+local countdownNecroticVenom		= mod:NewCountdown("AltTwo21.8", 215443)
 
 --mod:AddRangeFrameOption("5")--Add range frame to Necrotic Debuff if detecting it actually works with FindDebuff()
 mod:AddSetIconOption("SetIconOnWeb", 215307)
@@ -106,8 +106,10 @@ local function findDebuff(self, spellName, spellId)
 		if UnitDebuff(uId, spellName) then
 			found = found + 1
 			if spellId == 210864 then
-				warnTwistingShadows:CombinedShow(0.1, self.vb.twistedCast, name)
-				if name == UnitName("player") then
+				if self:AntiSpam(9.5, name) then
+					warnTwistingShadows:CombinedShow(0.4, self.vb.twistedCast, name)
+				end
+				if name == UnitName("player") and self:AntiSpam(9.5, 2) then
 					specWarnTwistingShadows:Show()
 					specWarnTwistingShadows:Play("runout")
 					local _, _, _, _, _, _, expires = UnitDebuff("Player", spellName)
@@ -119,8 +121,10 @@ local function findDebuff(self, spellName, spellId)
 					end
 				end
 			else
-				warnNecroticVenom:CombinedShow(0.1, name)
-				if name == UnitName("player") then
+				if self:AntiSpam(9.5, name) then
+					warnNecroticVenom:CombinedShow(0.4, name)
+				end
+				if name == UnitName("player") and self:AntiSpam(9.5, 3) then
 					specWarnNecroticVenom:Show()
 					specWarnNecroticVenom:Play("runout")
 					local _, _, _, _, _, _, expires = UnitDebuff("Player", spellName)
@@ -134,7 +138,7 @@ local function findDebuff(self, spellName, spellId)
 			end
 		end
 	end
-	if found == 0 and scanTime < 6 then--Scan for 1.8 sec, not forever.
+	if found < 2 and scanTime < 6 then--Scan for 1.8 sec, not forever.
 		self:Schedule(1, findDebuff, self, spellName, spellId)
 	end
 end
