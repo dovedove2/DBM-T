@@ -43,7 +43,7 @@ local warnTinkering					= mod:NewSpellAnnounce(210922, 1)
 
 --local specWarnSuppress2				= mod:NewSpecialWarningYou(209413, nil, nil, nil, 1, 2)
 local specWarnCripple2				= mod:NewSpecialWarningYou(214690, nil, nil, nil, 1, 3)
-local specWarnCripple				= mod:NewSpecialWarningDispel(214690, "MagicDispeller2", nil, nil, 1, 2)
+local specWarnCripple				= mod:NewSpecialWarningDispel(214690, "Healer", nil, nil, 1, 2)
 local specWarnShadowBoltVolley		= mod:NewSpecialWarningDodge(214692, "-Tank", nil, nil, 2, 3)
 local specWarnCarrionSwarm			= mod:NewSpecialWarningDodge(214688, nil, nil, nil, 2, 2)
 local specWarnFelDetonation			= mod:NewSpecialWarningDodge(211464, nil, nil, nil, 2, 3)
@@ -55,7 +55,7 @@ local specWarnChargedBlast			= mod:NewSpecialWarningDodge(212031, "Melee", nil, 
 local specWarnChargedSmash			= mod:NewSpecialWarningDodge(209495, "Melee", nil, nil, 2, 2)
 local specWarnDrainMagic			= mod:NewSpecialWarningInterrupt(209485, "HasInterrupt", nil, nil, 3, 5)
 local specWarnSubdue				= mod:NewSpecialWarningInterrupt(212773, "HasInterrupt", nil, nil, 1, 3)
-local specWarnSubdue2				= mod:NewSpecialWarningDispel(212773, "MagicDispeller2", nil, nil, 1, 2)
+local specWarnSubdue2				= mod:NewSpecialWarningDispel(212773, "Healer", nil, nil, 1, 2)
 local specWarnNightfallOrb			= mod:NewSpecialWarningInterrupt(209410, "HasInterrupt", nil, nil, 1, 2)
 local specWarnSuppress				= mod:NewSpecialWarningInterrupt(209413, "HasInterrupt", nil, nil, 1, 2)
 local specWarnBewitch				= mod:NewSpecialWarningInterrupt(211470, "HasInterrupt", nil, nil, 1, 2)
@@ -66,7 +66,7 @@ local specWarnDisruptingEnergy		= mod:NewSpecialWarningMove(209512, nil, nil, ni
 local specWarnWhirlingBlades		= mod:NewSpecialWarningRun(209378, "Melee", nil, nil, 4, 3)
 
 local timerCripple					= mod:NewTargetTimer(8, 214690, nil, nil, nil, 3, nil, DBM_CORE_MAGIC_ICON)
-local timerCrippleCD				= mod:NewCDTimer(20.5, 214690, nil, "MagicDispeller2", nil, 3, nil, DBM_CORE_HEALER_ICON..DBM_CORE_MAGIC_ICON)
+local timerCrippleCD				= mod:NewCDTimer(20.5, 214690, nil, "Healer", nil, 3, nil, DBM_CORE_HEALER_ICON..DBM_CORE_MAGIC_ICON)
 local timerShadowBoltVolleyCD		= mod:NewCDTimer(21, 214692, nil, nil, nil, 2, nil, DBM_CORE_DEADLY_ICON)
 local timerCarrionSwarmCD			= mod:NewCDTimer(17.5, 214688, nil, nil, nil, 3, nil, DBM_CORE_DEADLY_ICON)
 
@@ -88,6 +88,7 @@ local yellCarrionSwarm				= mod:NewYell(214688, nil, nil, nil, "SAY")
 mod:AddBoolOption("SpyHelper", true)
 
 mod.vb.wardens = 3
+mod.spyFound = false
 
 function mod:CarrionSwarmTarget(targetname, uId)
 	if not targetname then return end
@@ -261,7 +262,7 @@ function mod:SPELL_AURA_APPLIED(args)
 			specWarnCripple2:Show()
 			specWarnCripple2:Play("targetyou")
 			yellCripple:Yell()
-		elseif self:IsMagicDispeller2() then
+		else
 			if not UnitIsDeadOrGhost("player") then
 				specWarnCripple:Show(args.destName)
 				specWarnCripple:Play("dispelnow")
@@ -270,7 +271,7 @@ function mod:SPELL_AURA_APPLIED(args)
 	elseif spellId == 212773 then
 		if args:IsPlayer() then
 			yellSubdue:Yell()
-		elseif self:IsMagicDispeller2() then
+		else
 			if not UnitIsDeadOrGhost("player") then
 				specWarnSubdue2:CombinedShow(0.3, args.destName)
 				specWarnSubdue2:Play("dispelnow")
@@ -421,6 +422,15 @@ do
 	
 	function mod:CHAT_MSG_MONSTER_SAY(msg)
 		if msg:find(L.Found) then
+			if not self.spyFound then	
+				if IsInRaid() then
+					SendChatMessage("Spy Found", "RAID")
+				elseif IsInGroup(LE_PARTY_CATEGORY_INSTANCE) then
+					SendChatMessage("Spy Found", "INSTANCE_CHAT")
+				elseif IsInGroup(LE_PARTY_CATEGORY_HOME) then
+					SendChatMessage("Spy Found", "PARTY")
+				end
+			end
 			self:SendSync("Finished")
 		elseif msg == L.proshlyapMurchal then
 			self:SendSync("RolePlayMel")
@@ -468,6 +478,7 @@ do
 			DBM.InfoFrame:Show(5, "function", updateInfoFrame)
 		elseif msg == "Finished" then
 			warnPhase2:Show()
+			self.spyFound = true
 			self:ResetGossipState()
 		--	self:Finish()
 		elseif msg == "RolePlayMel" then

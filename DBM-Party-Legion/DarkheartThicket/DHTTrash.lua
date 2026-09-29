@@ -37,7 +37,7 @@ function mod:SPELL_CAST_START(args)
 		if not self:IsNormal() then
 			specWarnMaddeningRoar:Show()
 			specWarnMaddeningRoar:Play("defensive")
-	end
+		end
 	elseif spellId == 200768 and self:AntiSpam(1.5, 7) then
 		specWarnPropellingCharge:Show()
 		specWarnPropellingCharge:Play("watchstep")

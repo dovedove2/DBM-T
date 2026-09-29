@@ -27,12 +27,17 @@ local specWarnStomp					= mod:NewSpecialWarningSpell(198073, nil, nil, nil, 2, 2
 local specWarnHatefulGaze			= mod:NewSpecialWarningDefensive(198079, nil, nil, nil, 1, 2)
 local specWarnFelVomitus			= mod:NewSpecialWarningMove(198501, nil, nil, nil, 1, 3)
 local specWarnFelVomit				= mod:NewSpecialWarningYou(198446, nil, nil, nil, 4, 3)
-local yellHatefulGaze				= mod:NewYell(198079)
+
 local specWarnBrutalHaymakerSoon	= mod:NewSpecialWarningSoon(198245, "Tank|Healer", nil, nil, 1, 2)--Face fuck soon
 local specWarnBrutalHaymaker		= mod:NewSpecialWarningDefensive(198245, "Tank", nil, nil, 3, 2)--Incoming face fuck
 
 local timerStompCD					= mod:NewCDTimer(17, 198073, nil, nil, nil, 2)--Next timers but delayed by other casts
 local timerHatefulGazeCD			= mod:NewCDTimer(25.5, 198079, nil, nil, nil, 3)--Next timers but delayed by other casts
+
+local yellHatefulGaze				= mod:NewYell(198079)
+--local yellHatefulGaze2				= mod:NewFadesYell(198079)
+--local yellFelVomit					= mod:NewYell(198446)
+--local yellFelVomit2					= mod:NewFadesYell(198446)
 
 mod:AddInfoFrameOption(198080)
 mod:AddSetIconOption("SetIconOnHatefulGaze", 198079, true)
@@ -40,6 +45,7 @@ mod:AddSetIconOption("SetIconOnHatefulGaze", 198079, true)
 local superWarned = false
 
 function mod:OnCombatStart(delay)
+	superWarned = false
 	if not self:IsNormal() then
 		timerHatefulGazeCD:Start(5-delay)
 		if self.Options.InfoFrame then
@@ -79,14 +85,14 @@ function mod:SPELL_AURA_APPLIED(args)
 	elseif spellId == 198446 then
 		if args:IsPlayer() then
 			specWarnFelVomit:Schedule(2.5)
-			yellFelVomit:Yell()
-			yellFelVomit2:Countdown(6, 3)
+			--yellFelVomit:Yell()
+			--yellFelVomit2:Countdown(6, 3)
 		else
 			warnFelVomit:CombinedShow(0.5, args.destName)
 		end
-		if self.Options.SetIconOnFelVomit then
-			self:SetIcon(args.destName, self.vb.felVomitIcon)
-		end
+		--if self.Options.SetIconOnFelVomit then
+		--	self:SetIcon(args.destName, self.vb.felVomitIcon)
+		--end
 	end
 end
 
