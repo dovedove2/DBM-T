@@ -269,15 +269,12 @@ function mod:SPELL_AURA_APPLIED(args)
 			end
 		end
 	elseif spellId == 212773 then
+		warnSubdue:CombinedShow(0.3, args.destName)
 		if args:IsPlayer() then
 			yellSubdue:Yell()
-		else
-			if not UnitIsDeadOrGhost("player") then
+		elseif not UnitIsDeadOrGhost("player") then
 				specWarnSubdue2:CombinedShow(0.3, args.destName)
 				specWarnSubdue2:Play("dispelnow")
-			end
-		else
-			warnSubdue:CombinedShow(0.3, args.destName)
 		end
 	end
 end
