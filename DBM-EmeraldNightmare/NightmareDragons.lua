@@ -43,7 +43,7 @@ local warnNightmareBlast			= mod:NewSpellAnnounce(203153, 2)
 local warnVolatileInfection			= mod:NewTargetAnnounce(203787, 3)
 local warnEssenceOfCorruption		= mod:NewSpellAnnounce(205298, 2)
 --Lethon
-local warnGloom						= mod:NewSpellAnnounce(205329, 2)
+local warnGloom						= mod:NewSpellAnnounce(205329, 2, nil, false)
 local warnShadowBurst				= mod:NewTargetAnnounce(204040, 3)
 
 --All

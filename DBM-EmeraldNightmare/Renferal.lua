@@ -341,7 +341,7 @@ function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, spellGUID)
 		if self:IsMythic() and self.vb.platformCount == 2 then--Only happens platform 2, platform 4 (roc form second cast behaves like non mythic
 			self.vb.ViolentWindsPlat = true
 			timerViolentWindsCD:Start(56)--50
-			timerRakingTalonsCD:Start(73, 1)
+			timerRakingTalonsCD:Start(71.7, 1)
 			timerRazorWingCD:Start(74.2, 1) --fix this timer if raking talons goes off first
 		else
 			timerRakingTalonsCD:Start(52, 1)

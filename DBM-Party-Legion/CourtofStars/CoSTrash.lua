@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("CoSTrash", "DBM-Party-Legion", 7)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 17650 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 17521 $"):sub(12, -3))
 mod:SetZone()
 mod:SetOOCBWComms()
 
@@ -89,6 +89,7 @@ mod:AddBoolOption("SpyHelper", true)
 
 mod.vb.wardens = 3
 mod.spyFound = false
+mod.spyGUIDs = {}
 
 function mod:CarrionSwarmTarget(targetname, uId)
 	if not targetname then return end
@@ -417,23 +418,47 @@ do
 		DBM.InfoFrame:Hide()
 	end
 	
+	function mod:SpyFoundF()
+		if self.spyFound then return end
+
+		local lowestGUID
+		local playerGUID = UnitGUID("player")
+
+		for guid in pairs(self.spyGUIDs) do
+			if not lowestGUID or guid < lowestGUID then
+				lowestGUID = guid
+			end
+		end
+
+		if playerGUID == lowestGUID then
+			self.spyFound = true
+
+			if IsInRaid() then
+				SendChatMessage("Spy Found!", "RAID")
+			elseif IsInGroup(LE_PARTY_CATEGORY_INSTANCE) then
+				SendChatMessage("Spy Found!", "INSTANCE_CHAT")
+			elseif IsInGroup(LE_PARTY_CATEGORY_HOME) then
+				SendChatMessage("Spy Found!", "PARTY")
+			end
+
+			self:SendSync("Finished")
+		end
+	end
+	
 	function mod:CHAT_MSG_MONSTER_SAY(msg)
 		if msg:find(L.Found) then
-			if not self.spyFound then	
-				if IsInRaid() then
-					SendChatMessage("Spy Found", "RAID")
-				elseif IsInGroup(LE_PARTY_CATEGORY_INSTANCE) then
-					SendChatMessage("Spy Found", "INSTANCE_CHAT")
-				elseif IsInGroup(LE_PARTY_CATEGORY_HOME) then
-					SendChatMessage("Spy Found", "PARTY")
-				end
+			if not self.spyFound then
+				table.wipe(self.spyGUIDs)
+				local guid = UnitGUID("player")
+				self.spyGUIDs[guid] = true
+				self:SendSync("SpyCheck", guid)
+				self:ScheduleMethod(0.4, "SpyFoundF")
 			end
-			self:SendSync("Finished")
 		elseif msg == L.proshlyapMurchal then
 			self:SendSync("RolePlayMel")
 		end
 	end
-
+	
 	function mod:GOSSIP_SHOW()
 		if not self.Options.SpyHelper then return end
 		local guid = UnitGUID("npc")
@@ -473,6 +498,8 @@ do
 		if msg == "CoS" and clue then
 			hints[clue] = true
 			DBM.InfoFrame:Show(5, "function", updateInfoFrame)
+		elseif msg == "SpyCheck" and clue then
+			self.spyGUIDs[clue] = true
 		elseif msg == "Finished" then
 			warnPhase2:Show()
 			self.spyFound = true
@@ -482,6 +509,7 @@ do
 			timerRoleplay:Start()
 		end
 	end
+	
 	function mod:OnBWSync(msg, extra)
 		if msg ~= "clue" then return end
 		extra = tonumber(extra)

@@ -234,6 +234,29 @@ function mod:SpewCorruptionTarget(targetname, uId)
 	end
 end
 
+--[[function mod:RAID_BOSS_WHISPER(msg)
+	if msg:find("spell:208689") then
+		specWarnGroundSlam:Show()
+		yellGroundSlam:Yell()
+		specWarnGroundSlam:Play("targetyou")
+	end
+end--]]
+function mod:GroundSlamTarget(targetname, uId)
+	if not targetname then return end
+	if targetname == UnitName("player") then
+		specWarnGroundSlam:Show()
+		yellGroundSlam:Yell()
+		specWarnGroundSlam:Play("targetyou")
+	else
+		if self:CheckNearby(5, targetname) then
+			specWarnGroundSlamNear:Show(targetname)
+			specWarnGroundSlamNear:Play("watchwave")
+		else
+			warnGroundSlam:CombinedShow(1, targetname)
+		end
+	end
+end
+
 function mod:OnCombatStart(delay)
 	table.wipe(addsTable)
 	self.vb.phase = 1
@@ -388,6 +411,7 @@ function mod:SPELL_CAST_START(args)
 		end
 	elseif spellId == 208689 and self:AntiSpam(2, 6) then
 		timerGroundSlamCD:Start()
+		self:BossTargetScanner(105304, "GroundSlamTarget", 0.04, 8)
 	end
 end
 
@@ -556,14 +580,6 @@ function mod:INSTANCE_ENCOUNTER_ENGAGE_UNIT()
 	end
 end
 
-function mod:RAID_BOSS_WHISPER(msg)
-	if msg:find("spell:208689") then
-		specWarnGroundSlam:Show()
-		yellGroundSlam:Yell()
-		specWarnGroundSlam:Play("targetyou")
-	end
-end
-
 function mod:UNIT_DIED(args)
 	local cid = self:GetCIDFromGUID(args.destGUID)
 	if cid == 105591 or cid == 105304 or cid == 105383 or cid == 105322 or cid == 105721 then
@@ -633,7 +649,9 @@ do
 	end
 end
 
-function mod:OnTranscriptorSync(msg, targetName)
+
+
+--[[function mod:OnTranscriptorSync(msg, targetName)
 	if msg:find("spell:208689") and self:AntiSpam(2, targetName) then--Ground Slam
 		targetName = Ambiguate(targetName, "none")
 		if self:CheckNearby(5, targetName) then
@@ -643,4 +661,4 @@ function mod:OnTranscriptorSync(msg, targetName)
 			warnGroundSlam:CombinedShow(1, targetName)
 		end
 	end
-end
+end--]]
