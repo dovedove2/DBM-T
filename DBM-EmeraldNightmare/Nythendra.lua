@@ -48,7 +48,7 @@ local timerBreathCD					= mod:NewCDCountTimer(38, 202977, nil, nil, nil, 3)--36-
 local timerVolatileRotCD			= mod:NewCDCountTimer(23, 204463, nil, nil, nil, 5, nil, DBM_CORE_TANK_ICON)--20.5-24 variation non mythic. 22-30 mythic
 local timerRotCD					= mod:NewCDCountTimer(15.7, 203096, nil, nil, nil, 3)
 local timerSwarm					= mod:NewBuffActiveTimer(23.9, 203552, nil, nil, nil, 6)
-local timerSwarmCD					= mod:NewCDCountTimer(98, 203552, nil, nil, nil, 6)--Needs new sample size
+local timerSwarmCD					= mod:NewCDCountTimer(101.5, 203552, nil, nil, nil, 6)
 mod:AddTimerLine(ENCOUNTER_JOURNAL_SECTION_FLAG12)
 local timerInfestingMindCD			= mod:NewNextTimer(12.5, 205043, nil, nil, nil, 3, nil, DBM_CORE_HEROIC_ICON)--36-42
 
