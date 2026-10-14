@@ -21,7 +21,7 @@ local warnTaintofSea					= mod:NewTargetAnnounce(197262, 2, nil, false)
 local warnSubmerged						= mod:NewTargetAnnounce(196947, 2)
 
 local specWarnDestructorTentacle		= mod:NewSpecialWarningSwitch("ej12364", "Tank")
-local specWarnBrackwaterBarrage			= mod:NewSpecialWarningDodge(202088, "-Tank", nil, nil, 2, 2)--Tank stays with destructor tentacle no matter what
+local specWarnBrackwaterBarrage			= mod:NewSpecialWarningDodge(202088, nil, nil, nil, 2, 2)--Tank stays with destructor tentacle no matter what
 local specWarnSubmergedOver				= mod:NewSpecialWarningEnd(196947)
 local specWarnBreath					= mod:NewSpecialWarningDodge(227233, nil, nil, nil, 2, 2)
 local specWarnTorrent					= mod:NewSpecialWarningInterrupt(198495, "HasInterrupt", nil, nil, 1, 2)
