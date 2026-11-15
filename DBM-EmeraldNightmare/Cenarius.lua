@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(1750, "DBM-EmeraldNightmare", nil, 768)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 17471 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 17522 $"):sub(12, -3))
 mod:SetCreatureID(104636)
 mod:SetEncounterID(1877)
 mod:SetZone()
@@ -19,6 +19,7 @@ mod:RegisterEventsInCombat(
 	"SPELL_AURA_REMOVED 210346",
 	"UNIT_DIED",
 	"UNIT_SPELLCAST_SUCCEEDED boss1 boss2 boss3 boss4 boss5",
+	"CHAT_MSG_MONSTER_YELL",
 	"UNIT_AURA player"
 )
 
@@ -27,7 +28,7 @@ local warnNightmareBrambles			= mod:NewTargetAnnounce(210290, 2)
 local warnPhase2					= mod:NewPhaseAnnounce(2, 2, nil, nil, nil, nil, nil, 2)
 ----Forces of Nightmare
 local warnDesiccatingStomp			= mod:NewCastAnnounce(211073, 3, nil, nil, true, 2)--Basic warning for now, will change to special if needed
-local warnRottenBreath				= mod:NewTargetAnnounce(211192, 2)
+local warnRottenBreath				= mod:NewCastAnnounce(211192, 2)
 local warnScornedTouch				= mod:NewTargetAnnounce(211471, 3)
 --Malfurion Stormrage
 local warnCleansingGround			= mod:NewCastAnnounce(212630, 1)
@@ -47,7 +48,7 @@ local specWarnSpearOfNightmaresMelee= mod:NewSpecialWarningRun(214529, nil, nil,
 local specWarnEntangledNightmares	= mod:NewSpecialWarningSwitch(214505, "Dps", nil, nil, 1, 2)
 local specWarnBeastsOfNightmare		= mod:NewSpecialWarningDodge(214876, nil, nil, nil, 2, 2)
 ----Forces of Nightmare
-local yellRottenBreath				= mod:NewYell(211192)
+--local yellRottenBreath				= mod:NewYell(211192)
 local specWarnTouchofLife			= mod:NewSpecialWarningInterrupt(211368, "HasInterrupt")
 local specWarnTouchofLifeDispel		= mod:NewSpecialWarningDispel(211368, "MagicDispeller")
 local specWarnScornedTouch			= mod:NewSpecialWarningMoveAway(211471, nil, nil, nil, 3, 2)
@@ -57,7 +58,7 @@ local yellScornedTouch				= mod:NewYell(211471)
 mod:AddTimerLine(L.name)
 local timerNightmareBramblesCD		= mod:NewCDTimer(30, 210290, nil, "-Tank", 2, 3)--On for all, for now. Doesn't target melee but melee still have to be aware. Just not AS aware.
 local timerDreadThornsCD			= mod:NewCDTimer(39.1, 210346, nil, false, 3, 5, nil, DBM_CORE_TANK_ICON)--Optional but off by default
-local timerNightmareBlastCD			= mod:NewNextTimer(32, 213162, nil, "Tank", nil, 5, nil, DBM_CORE_TANK_ICON)
+local timerNightmareBlastCD			= mod:NewNextTimer(30, 213162, nil, "Tank", nil, 5, nil, DBM_CORE_TANK_ICON)
 local timerForcesOfNightmareCD		= mod:NewCDCountTimer(84.1, 212726, nil, nil, nil, 1)--77.8-80
 local timerSpearOfNightmaresCD		= mod:NewCDTimer(18.2, 214529, nil, "Melee|Healer", 3, 5, nil, DBM_CORE_TANK_ICON)
 local timerBeastsOfNightmareCD		= mod:NewCDTimer(30, 214876, nil, nil, 2, 3, nil, DBM_CORE_DEADLY_ICON)
@@ -66,16 +67,16 @@ local timerEntanglingNightmareCD	= mod:NewNextTimer(51, 214505, nil, nil, nil, 1
 local timerCleansingGroundCD		= mod:NewNextTimer(77, 214249, nil, nil, nil, 3)--Phase 2 version only for now. Not sure if cast more than once though?
 ----Forces of Nightmare
 mod:AddTimerLine(DBM_ADDS)
-local timerScornedTouchCD			= mod:NewCDTimer(20.7, 211471, nil, nil, nil, 3, nil, DBM_CORE_DEADLY_ICON)
+local timerScornedTouchCD			= mod:NewCDTimer(18.8, 211471, nil, nil, nil, 3, nil, DBM_CORE_DEADLY_ICON)
 local timerTouchofLifeCD			= mod:NewCDTimer(15, 211368, nil, nil, nil, 4, nil, DBM_CORE_INTERRUPT_ICON)
-local timerRottenBreathCD			= mod:NewCDTimer(24.3, 211192, nil, nil, nil, 3)
+local timerRottenBreathCD			= mod:NewCDTimer(26.1, 211192, nil, nil, nil, 3)
 local timerDisiccatingStompCD		= mod:NewCDTimer(32, 211073, nil, nil, nil, 2, nil, DBM_CORE_HEALER_ICON)
 
 --Cenarius
 local countdownForcesOfNightmare	= mod:NewCountdown(84.1, 212726)
 local countdownNightmareBrambles	= mod:NewCountdown("AltTwo30", 210290, "Ranged")--Never once saw this target melee
-local countdownNightmareBlast		= mod:NewCountdown("Alt32", 213162, "Tank")
-local countdownSpearOfNightmares	= mod:NewCountdown("Alt18", 214529, "Melee", 2)
+local countdownNightmareBlast		= mod:NewCountdown("Alt30", 213162, "Tank")
+local countdownSpearOfNightmares	= mod:NewCountdown("Alt18.2", 214529, "Melee", 2)
 ----Forces of Nightmare
 
 mod:AddRangeFrameOption(8, 211471)
@@ -91,9 +92,9 @@ local debuffName, infoframeName = DBM:GetSpellInfo(211471), DBM:GetSpellInfo(210
 
 function mod:BreathTarget(targetname, uId)
 	if not targetname then return end
-	warnRottenBreath:Show(targetname)
+	--warnRottenBreath:Show(targetname)
 	if targetname == UnitName("player") then
-		yellRottenBreath:Yell()
+		--yellRottenBreath:Yell()
 	end
 end
 
@@ -106,11 +107,11 @@ function mod:OnCombatStart(delay)
 	timerForcesOfNightmareCD:Start(6.5-delay, 1)
 	countdownForcesOfNightmare:Start(6.5-delay)
 	timerDreadThornsCD:Start(12.6-delay)
-	timerNightmareBramblesCD:Start(27.5-delay)--Cast finish. Cast start is actually a yell and not worth using anyways since DBM doesn't warn spawn point until cast finish
-	countdownNightmareBrambles:Start(27.5-delay)
+	timerNightmareBramblesCD:Start(28.5-delay)--Cast finish. Cast start is actually a yell and not worth using anyways since DBM doesn't warn spawn point until cast finish
+	countdownNightmareBrambles:Start(28.5-delay)
 	if self:IsMythic() then
-		timerNightmareBlastCD:Start(30.5-delay)
-		countdownNightmareBlast:Start(30.5-delay)
+		timerNightmareBlastCD:Start(28-delay)
+		countdownNightmareBlast:Start(28-delay)
 	end
 	self:RegisterShortTermEvents(
 		"INSTANCE_ENCOUNTER_ENGAGE_UNIT"
@@ -161,7 +162,7 @@ function mod:SPELL_CAST_START(args)
 		end
 	elseif spellId == 214529 then
 		timerSpearOfNightmaresCD:Start()
-		countdownSpearOfNightmares:Start(18.2)
+		countdownSpearOfNightmares:Start()
 		local targetName, uId, bossuid = self:GetBossTarget(104636, true)
 		local tanking, status = UnitDetailedThreatSituation("player", bossuid)
 		if tanking or (status == 3) then--Player is current target
@@ -249,42 +250,43 @@ function mod:INSTANCE_ENCOUNTER_ENGAGE_UNIT()
 			local cid = self:GetCIDFromGUID(GUID)
 			if cid == 105495 then--Scorned Sister
 				self.vb.sisterCount = self.vb.sisterCount + 1
-				timerScornedTouchCD:Start(4.5, GUID)
-				timerTouchofLifeCD:Start(6, GUID)
+				timerScornedTouchCD:Start(5, GUID)
+				timerTouchofLifeCD:Start(7, GUID)
 				if self.Options.RangeFrame then
 					DBM.RangeCheck:Show(8)
 				end
 			elseif cid == 105494 then--Rotten Drake
-				timerRottenBreathCD:Start(18.5, GUID)
+				timerRottenBreathCD:Start(21.2, GUID)
 			elseif cid == 105468 then--Nightmare Ancient
-				timerDisiccatingStompCD:Start(18.5, GUID)
+				timerDisiccatingStompCD:Start(18, GUID)
 			end
 		end
 	end
 end
 
-function mod:UNIT_DIED(args)
+function mod:UNIT_DIED(args) --todo, fix cancel for timer with id
 	local cid = self:GetCIDFromGUID(args.destGUID)
 	if cid == 105495 then--Scorned Sister
 		self.vb.sisterCount = self.vb.sisterCount - 1
-		timerTouchofLifeCD:Stop(args.destGUID)
-		timerScornedTouchCD:Stop(args.destGUID)
+		timerTouchofLifeCD:Cancel(args.destGUID)
+		timerScornedTouchCD:Cancel(args.destGUID)
 		if self.Options.RangeFrame and self.vb.sisterCount == 0 and not DBM:UnitDebuff("player", debuffName) then--Do to shitty spellInfo code, it'll fail to hide first time
 			DBM.RangeCheck:Hide()
 		end
 	elseif cid == 105494 then--Rotten Drake
 		--This is safer method to cancel it but if more than 1 drake is up it may in rare cases break scan for 2nd drake
 		self:BossUnitTargetScannerAbort()
-		timerRottenBreathCD:Stop(args.destGUID)
+		timerRottenBreathCD:Cancel(args.destGUID)
 	elseif cid == 105468 then--Nightmare Ancient
-		timerDisiccatingStompCD:Stop(args.destGUID)
+		timerDisiccatingStompCD:Cancel(args.destGUID)
 	end
 end
 
 function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, spellGUID)
 	local spellId = tonumber(select(5, strsplit("-", spellGUID)), 10)
 	if spellId == 211189 then--Rotten Breath precast. Best method for fastest and most accurate target scanning
-		self:BossUnitTargetScanner(uId, "BreathTarget")
+		--self:BossUnitTargetScanner(uId, "BreathTarget")
+		warnRottenBreath:Show()
 		timerRottenBreathCD:Start(nil, UnitGUID(uId))
 	elseif spellId == 210290 then--Bramble cast finish (only thing not hidden, probably be hidden too by live, if so will STILL find a way to warn this, even if it means scanning boss 24/7)
 		if not UnitExists(uId.."target") then return end--Blizzard decided to go even further out of way to break this detection, if this happens we don't want nil errors for users.
@@ -312,8 +314,8 @@ function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, spellGUID)
 		timerCleansingGroundCD:Stop()
 		countdownForcesOfNightmare:Cancel()
 		timerNightmareBramblesCD:Start(13)
-		timerSpearOfNightmaresCD:Start(20)
-		countdownSpearOfNightmares:Start(20)
+		timerSpearOfNightmaresCD:Start(19.6)
+		countdownSpearOfNightmares:Start(19.6)
 		timerCleansingGroundCD:Start(30.5)
 		timerEntanglingNightmareCD:Start(35)
 --		if self:IsMythic() then
@@ -348,5 +350,16 @@ do
 				DBM.RangeCheck:Hide()
 			end
 		end
+	end
+end
+
+function mod:BramblesCastDelayed()
+	timerNightmareBramblesCD:Start()
+	countdownNightmareBrambles:Start()
+end
+
+function mod:CHAT_MSG_MONSTER_YELL(msg)
+	if msg == L.BrambleMonsterYell then
+		self:Schedule(3.5, self.BramblesCastDelayed, self)	
 	end
 end

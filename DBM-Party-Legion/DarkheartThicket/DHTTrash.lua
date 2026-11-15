@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("DHTTrash", "DBM-Party-Legion", 2)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 17518 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 17522 $"):sub(12, -3))
 --mod:SetModelID(47785)
 mod:SetZone()
 
@@ -9,17 +9,23 @@ mod.isTrashMod = true
 
 mod:RegisterEvents(
 	"SPELL_CAST_START 200580 200630 200768",
-	"SPELL_AURA_APPLIED 204243"
+	"SPELL_AURA_APPLIED 204243",
+	"SPELL_DAMAGE 225484",
+	"SPELL_MISSED 225484",
+	"UNIT_DIED",
+	"PLAYER_REGEN_ENABLED"
 )
 
 --TODO: Cat Leaps
-local warnUnnervingScreech				= mod:NewCastAnnounce(200630, 4)
+local warnUnnervingScreech				= mod:NewSpellAnnounce(200630, 4)
 
 local specWarnPropellingCharge			= mod:NewSpecialWarningDodge(200768, nil, nil, nil, 2, 3)
 local specWarnMaddeningRoar				= mod:NewSpecialWarningSpell(200580, nil, nil, nil, 1, 5)
 
 local specWarnTormentingEye				= mod:NewSpecialWarningInterrupt(204243, "HasInterrupt", nil, nil, 1, 2)
 local specWarnUnnervingScreech			= mod:NewSpecialWarningInterrupt(200630, "HasInterrupt", nil, nil, 1, 2)
+
+local timerGrievousRipCD				= mod:NewCDTimer(16, 225484, nil, nil, nil, 3)
 
 
 function mod:SPELL_CAST_START(args)
@@ -53,4 +59,32 @@ function mod:SPELL_AURA_APPLIED(args)
 			specWarnTormentingEye:Play("kickcast")
 		end
 	end
+end
+
+function mod:RipTimer(self, sourceGUID)
+	timerGrievousRipCD:Start(nil, sourceGUID)
+	self:UnscheduleMethod("RipTimer", self, sourceGUID)
+	self:ScheduleMethod(16, "RipTimer", self, sourceGUID)
+end
+
+function mod:SPELL_DAMAGE(sourceGUID, _, _, _, _, _, _, _, spellId)
+	if spellId == 225484 then
+		timerGrievousRipCD:Start(nil, sourceGUID)
+		self:UnscheduleMethod("RipTimer", self, sourceGUID)
+		self:ScheduleMethod(16, "RipTimer", self, sourceGUID)
+	end
+end
+mod.SPELL_MISSED = mod.SPELL_DAMAGE
+
+function mod:UNIT_DIED(args)
+	local cid = self:GetCIDFromGUID(args.destGUID)
+	if cid == 95772 then
+		timerGrievousRipCD:Cancel(args.destGUID)
+		self:UnscheduleMethod("RipTimer", self, args.destGUID)
+	end
+end
+
+function mod:PLAYER_REGEN_ENABLED()
+    timerGrievousRipCD:Cancel()
+	self:UnscheduleMethod("RipTimer")
 end

@@ -34,7 +34,7 @@ local specWarnPiercingShards	= mod:NewSpecialWarningSpell(226296, "Tank", nil, n
 
 local timerFrenzy				= mod:NewTargetTimer(8, 201983, nil, "Tank", nil, 3, nil)
 
-local timerRoleplay				= mod:NewTimer(22.2, "timerRoleplay", "Interface\\Icons\\Spell_Holy_BorrowedTime", nil, nil, 7)
+local timerRoleplay				= mod:NewTimer(23.6, "timerRoleplay", "Interface\\Icons\\Spell_Holy_BorrowedTime", nil, nil, 7)
 
 local yellStoneGaze				= mod:NewYell(202181)
 
@@ -103,7 +103,7 @@ end
 
 function mod:OnSync(msg, GUID)
 	if msg == "RP1" then
-		timerRoleplay:Start(24)
+		timerRoleplay:Start(23.6)
 	end
 end
 

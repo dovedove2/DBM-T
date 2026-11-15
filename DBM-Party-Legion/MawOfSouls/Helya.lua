@@ -19,6 +19,7 @@ mod:RegisterEventsInCombat(
 
 local warnTaintofSea					= mod:NewTargetAnnounce(197262, 2, nil, false)
 local warnSubmerged						= mod:NewTargetAnnounce(196947, 2)
+local warnTentaclesLeft					= mod:NewAddsLeftAnnounce(201178, 2)
 
 local specWarnDestructorTentacle		= mod:NewSpecialWarningSwitch("ej12364", "Tank")
 local specWarnBrackwaterBarrage			= mod:NewSpecialWarningDodge(202088, nil, nil, nil, 2, 2)--Tank stays with destructor tentacle no matter what
@@ -40,13 +41,20 @@ local countdownBreath					= mod:NewCountdown(22, 227233)
 local countdownSubmerged				= mod:NewCountdown("Alt74", 196947, nil, nil, 5)
 
 mod.vb.phase = 1
+mod.vb.tentaclesCount = 6
+local seenMobs = {}
 
 function mod:OnCombatStart(delay)
 	self.vb.phase = 1
+	self.vb.tentaclesCount = 6
+	table.wipe(seenMobs)
 	timerPiercingTentacleCD:Start(10-delay)
 	timerBrackwaterBarrageCD:Start(20-delay)
 	countdownBrackwaterBarrage:Start(20-delay)
 	timerTaintofSeaCD:Start(5.3-delay)
+	self:RegisterShortTermEvents(
+		"INSTANCE_ENCOUNTER_ENGAGE_UNIT"
+	)
 end
 
 function mod:SPELL_CAST_START(args)
@@ -123,4 +131,24 @@ function mod:UNIT_SPELLCAST_SUCCEEDED(uId, _, _, spellGUID)
 			timerPiercingTentacleCD:Start(6)
 		end
 	end
+end
+
+function mod:INSTANCE_ENCOUNTER_ENGAGE_UNIT()
+	local bosses = {}
+	for i = 1, 5 do
+		local guid = UnitGUID(("boss%d"):format(i))
+		if guid then
+			bosses[guid] = true
+		end
+	end
+	for guid in next, seenMobs do
+		if not bosses[guid] then
+			self.vb.tentaclesCount = self.vb.tentaclesCount - 1
+			if self.vb.tentaclesCount > 0 then
+				warnTentaclesLeft:Show(self.vb.tentaclesCount)
+			end
+		end
+		seenMobs[guid] = nil
+	end
+	seenMobs = bosses
 end

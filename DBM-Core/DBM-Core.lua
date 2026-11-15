@@ -41,9 +41,9 @@
 --  Globals/Default Options  --
 -------------------------------
 DBM = {
-	Revision = tonumber(("$Revision: 17520 $"):sub(12, -3)),
+	Revision = tonumber(("$Revision: 17521 $"):sub(12, -3)),
 	DisplayVersion = "7.3.32T", -- the string that is shown as version
-	ReleaseRevision = 17520 -- the revision of the latest stable version that is available
+	ReleaseRevision = 17521 -- the revision of the latest stable version that is available
 }
 DBM.HighestRelease = DBM.ReleaseRevision --Updated if newer version is detected, used by update nags to reflect critical fixes user is missing on boss pulls
 
@@ -4280,7 +4280,7 @@ do
 				if testBuild and revDifference > 5 then
 					updateNotificationDisplayed = 3
 					AddMsg(DBM, DBM_CORE_UPDATEREMINDER_DISABLE)
-					DBM:Disable()
+					--DBM:Disable()
 				else
 					updateNotificationDisplayed = 2
 					AddMsg(DBM, DBM_CORE_UPDATEREMINDER_HEADER_ALPHA:format(revDifference))
@@ -6743,8 +6743,8 @@ end
 --  Enable/Disable DBM  --
 --------------------------
 function DBM:Disable()
-	unscheduleAll()
-	dbmIsEnabled = false
+	--unscheduleAll()
+	--dbmIsEnabled = false
 end
 
 function DBM:Enable()

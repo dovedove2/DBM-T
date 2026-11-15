@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod(1726, "DBM-EmeraldNightmare", nil, 768)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 17518 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 17522 $"):sub(12, -3))
 mod:SetCreatureID(103769)
 mod:SetEncounterID(1864)
 mod:SetZone()
@@ -19,8 +19,11 @@ mod:RegisterEventsInCombat(
 	"SPELL_AURA_APPLIED_DOSE 206651 209158",
 	"SPELL_AURA_REMOVED 208431 211802 206651 209158 209034 210451 224508 206005",
 	"UNIT_DIED",
+	"SPELL_DAMAGE 189448",
+	"SPELL_MISSED 189448",
 	"UNIT_SPELLCAST_SUCCEEDED boss1"
 )
+
 
 --"<271.21 22:57:25> [CLEU] SPELL_PERIODIC_ENERGIZE##nil#Player-3693-07CA07EE#Jaybee#208385#Tainted Discharge#3#10", -- [5739]
 --TODO, infoframe for remaining tainted discharge maybe? Has to be combined with alt power infoframe
@@ -49,6 +52,7 @@ local specWarnDreaming					= mod:NewSpecialWarningCount(205843, nil, nil, nil, 1
 --Stage One: The Decent Into Madness
 local specWarnNightmareBlades			= mod:NewSpecialWarningMoveAway(206656, nil, nil, nil, 1, 2)
 local yellNightmareBlades				= mod:NewYell(206656)
+local specWarnNightmareReverberations	= mod:NewSpecialWarningMove(189448, nil, nil, nil, 1, 2)
 local specWarnCorruptionHorror			= mod:NewSpecialWarningSwitchCount("ej12973", "-Healer", nil, nil, 1, 2)
 local specWarnCorruptingNova			= mod:NewSpecialWarningSpell(207830, nil, nil, nil, 2, 2)
 local specWarnDarkeningSoulYou			= mod:NewSpecialWarningStack(206651, nil, 3, nil, 2, 1, 6)
@@ -104,6 +108,7 @@ local bladesTarget = {}
 local gatherTarget = {}
 local playerName = UnitName("player")
 local UnitDebuff = UnitDebuff
+local playerGUID = UnitGUID("player")
 local playerHasDream = false
 mod.vb.phase = 1
 mod.vb.lurkingCount = 0
@@ -392,6 +397,14 @@ function mod:SPELL_AURA_APPLIED(args)
 	end
 end
 mod.SPELL_AURA_APPLIED_DOSE = mod.SPELL_AURA_APPLIED
+
+function mod:SPELL_DAMAGE(_, _, _, _, destGUID, _, _, _, spellId)
+	if spellId == 189448 and destGUID == playerGUID and self:AntiSpam(2, 2) then
+		specWarnNightmareReverberations:Show()
+		specWarnNightmareReverberations:Play("runaway")
+	end
+end
+mod.SPELL_MISSED = mod.SPELL_DAMAGE
 
 function mod:SPELL_AURA_REMOVED(args)
 	local spellId = args.spellId
